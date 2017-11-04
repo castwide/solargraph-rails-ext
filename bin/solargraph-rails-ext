@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'bundler'
+require 'eventmachine'
+require 'json'
 
 def find_constant(namespace, root)
   result = nil
@@ -32,41 +34,39 @@ def inner_find_constant(namespace)
 end
 
 workspace = ARGV[0]
+Dir.chdir workspace
 Bundler.with_original_env do
   ENV['BUNDLE_GEMFILE'] = File.join(workspace, 'Gemfile')
   Bundler.reset!
   Bundler.require
   rails_config = File.join(workspace, 'config', 'environment.rb')
   if File.file?(rails_config)
-	#require_relative File.join(workspace, 'config', 'boot.rb')
     require_relative(rails_config)
   end
 end
 
-#con = find_constant(ARGV[2], ARGV[3].to_s)
-#puts [].to_json if con.nil?
-#if (ARGV[1] == 'class')
-#  puts con.methods.to_json
-#elsif (ARGV[1] == 'instance')
-#  puts con.instance_methods.to_json
-#else
-#  puts [].to_json
-#end
-
-#while true
-  entry = STDIN.gets
-  if entry.nil?
-    puts nil
-  else
-    parts = entry.split(' ')
-    con = find_constant(parts[1], parts[2].to_s)
-    puts [].to_json if con.nil?
-    if (parts[0] == 'class')
-      puts con.methods.to_json
-    elsif (parts[0] == 'instance')
-      puts con.instance_methods.to_json
-    else
-      puts [].to_json
-    end
+module LiveMapServer
+  def post_init
   end
-#end
+
+  def receive_data data
+    parts = data.split(' ')
+    result = []
+    con = find_constant(parts[1], parts[2].to_s)
+    unless con.nil?
+      if (parts[0] == 'class')
+        result.concat con.public_methods
+      elsif (parts[0] == 'instance')
+        result.concat con.public_instance_methods
+      end
+    end
+    send_data "#{result.to_json}\n"
+  end
+
+  def unbind
+  end
+end
+
+EventMachine.run {
+  EventMachine.start_server 'localhost', 80801, LiveMapServer
+}

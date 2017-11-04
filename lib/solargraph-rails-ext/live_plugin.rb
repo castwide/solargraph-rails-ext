@@ -1,4 +1,5 @@
 require 'thread'
+require 'socket'
 
 module SolargraphRailsExt
   class LivePlugin
@@ -8,41 +9,22 @@ module SolargraphRailsExt
       @workspace = workspace
       @cache = {}
       @semaphore = Mutex.new
-      @io = nil
-      open
-      at_exit { @io.close }
-    end
-
-    def open
-      @semaphore.synchronize do
-        @io = IO.popen("solargraph-rails-ext #{workspace}", "r+")
-      end
+      @job = spawn("solargraph-rails-ext", workspace)
+      at_exit { Process.kill("KILL", @job) unless @job.nil? }
     end
 
     def close
-      @semaphore.synchronize do
-        @io.close
-      end
-    end
-
-    def reload
-      @semaphore.synchronize do
-        @cache.clear
-      end
-      close
-      open
+      Process.kill("KILL", @job)
+      @job = nil
     end
 
     def query scope, namespace, root
-      @semaphore.synchronize do
-        #result = @cache[[scope, namespace, root]]
-        #if result.nil?
-          @io.puts "#{scope} #{namespace} #{root}"
-          result = JSON.parse(@io.gets)
-          #@cache[[scope, namespace, root]] = result
-        #end
-        result
-      end
+      s = TCPSocket.open('localhost', 80801)
+      s.puts "#{scope} #{namespace} #{root}"
+      data = s.gets
+      return [] if data.nil?
+      s.close
+      JSON.parse(data)
     end
   end
 end
