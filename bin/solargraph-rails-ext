@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+require 'bundler'
+
+def find_constant(namespace, root)
+  result = nil
+  parts = root.split('::')
+  if parts.empty?
+    result = inner_find_constant(namespace)
+  else
+    until parts.empty?
+      result = inner_find_constant("#{parts.join('::')}::#{namespace}")
+      break unless result.nil?
+      parts.pop
+    end
+  end
+  result
+end
+
+def inner_find_constant(namespace)
+  cursor = Object
+  parts = namespace.split('::')
+  until parts.empty?
+    here = parts.shift
+    begin
+      cursor = cursor.const_get(here)
+    rescue NameError
+      return nil
+    end
+  end
+  cursor
+end
+
+workspace = ARGV[0]
+Bundler.with_original_env do
+  ENV['BUNDLE_GEMFILE'] = File.join(workspace, 'Gemfile')
+  Bundler.reset!
+  Bundler.require
+  rails_config = File.join(workspace, 'config', 'environment.rb')
+  if File.file?(rails_config)
+	#require_relative File.join(workspace, 'config', 'boot.rb')
+    require_relative(rails_config)
+  end
+end
+
+#con = find_constant(ARGV[2], ARGV[3].to_s)
+#puts [].to_json if con.nil?
+#if (ARGV[1] == 'class')
+#  puts con.methods.to_json
+#elsif (ARGV[1] == 'instance')
+#  puts con.instance_methods.to_json
+#else
+#  puts [].to_json
+#end
+
+#while true
+  entry = STDIN.gets
+  if entry.nil?
+    puts nil
+  else
+    parts = entry.split(' ')
+    con = find_constant(parts[1], parts[2].to_s)
+    puts [].to_json if con.nil?
+    if (parts[0] == 'class')
+      puts con.methods.to_json
+    elsif (parts[0] == 'instance')
+      puts con.instance_methods.to_json
+    else
+      puts [].to_json
+    end
+  end
+#end
