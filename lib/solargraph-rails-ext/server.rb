@@ -15,6 +15,10 @@ module SolargraphRailsExt
     end
 
     def run
+      Signal.trap("INT") {
+        STDERR.puts "Received INT signal"
+        EventMachine.stop
+      }
       EventMachine.run {
         EventMachine.start_server 'localhost', @port, SolargraphRailsExt::EventModule
       }

@@ -2,8 +2,13 @@ module SolargraphRailsExt
   module EventModule
     def post_init
     end
-  
+
     def receive_data data
+      if data.strip == 'close'
+        STDERR.puts "Received close command"
+        EventMachine.stop
+        return
+      end
       parts = JSON.parse(data)
       result = []
       con = find_constant(parts['namespace'], parts['root'])
@@ -23,8 +28,9 @@ module SolargraphRailsExt
         end
       end
       send_data "#{result.to_json}\n"
+      close_connection_after_writing
     end
-  
+
     def unbind
     end
 
@@ -44,7 +50,7 @@ module SolargraphRailsExt
       end
       result
     end
-    
+
     def inner_find_constant(namespace)
       cursor = Object
       parts = namespace.split('::')
@@ -57,6 +63,6 @@ module SolargraphRailsExt
         end
       end
       cursor
-    end  
+    end
   end
 end

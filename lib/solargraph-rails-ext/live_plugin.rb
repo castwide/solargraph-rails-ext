@@ -12,17 +12,24 @@ module SolargraphRailsExt
       @workspace = workspace
       @cache = {}
       @port = available_port
-      at_exit { close }
+      @thread = nil
       open
     end
 
     def open
-      @job = spawn("solargraph-rails-ext", workspace, @port.to_s) if @job.nil?
+      if @job.nil?
+        STDERR.puts "Starting the server process on port #{@port}"
+        @job = spawn("solargraph-rails-ext", workspace, @port.to_s, "<NUL", new_pgroup: true)
+      end
     end
 
     def close
-      Process.kill("KILL", @job) unless @job.nil?
-      @job = nil
+      unless @job.nil?
+        STDERR.puts "Closing #{@job} (port #{@port})"
+        Process.kill("INT", @job)
+        Process.wait(@job)
+        @job = nil
+      end
     end
 
     def query namespace, root, scope, visibility
