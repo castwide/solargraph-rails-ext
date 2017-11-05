@@ -18,6 +18,7 @@ module SolargraphRailsExt
     end
 
     def open
+      return unless using_rails?
       if @job.nil?
         STDERR.puts "Starting the server process on port #{@port}"
         if can_posix?
@@ -29,6 +30,7 @@ module SolargraphRailsExt
     end
 
     def close
+      return unless using_rails?
       unless @job.nil?
         STDERR.puts "Closing #{@job} (port #{@port})"
         if can_posix?
@@ -41,6 +43,7 @@ module SolargraphRailsExt
     end
 
     def query namespace, root, scope, visibility
+      return [] unless using_rails?
       begin
         s = TCPSocket.open('localhost', @port)
         s.puts({
@@ -54,6 +57,12 @@ module SolargraphRailsExt
         STDERR.puts "The Rails live plugin is not ready yet."
         []
       end
+    end
+
+    def using_rails?
+      # @todo This a quick and dirty way to see if the workspace is a Rails
+      # project. Investigate better methods.
+      File.exist?(File.join workspace, 'bin', 'rails')
     end
   end
 end
