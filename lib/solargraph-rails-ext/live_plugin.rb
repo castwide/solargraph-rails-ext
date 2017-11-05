@@ -23,14 +23,19 @@ module SolargraphRailsExt
     end
 
     def query namespace, root, scope, visibility
-      s = TCPSocket.open('localhost', @port)
-      s.puts({
-        scope: scope, namespace: namespace, root: root, visibility: visibility
-      }.to_json)
-      data = s.gets
-      return [] if data.nil?
-      s.close
-      JSON.parse(data)
+      begin
+        s = TCPSocket.open('localhost', @port)
+        s.puts({
+          scope: scope, namespace: namespace, root: root, visibility: visibility
+        }.to_json)
+        data = s.gets
+        return [] if data.nil?
+        s.close
+        JSON.parse(data)
+      rescue Errno::ECONNREFUSED => e
+        STDERR.puts "The Rails live plugin is not ready yet."
+        []
+      end
     end
   end
 end
