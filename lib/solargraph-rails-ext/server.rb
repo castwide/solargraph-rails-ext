@@ -6,6 +6,8 @@ require 'solargraph-rails-ext/event_module'
 
 module SolargraphRailsExt
   class Server
+    include SolargraphRailsExt::ProcessMethods
+
     attr_reader :workspace
 
     def initialize workspace, port
@@ -15,10 +17,17 @@ module SolargraphRailsExt
     end
 
     def run
-      Signal.trap("INT") {
-        STDERR.puts "Received INT signal"
-        EventMachine.stop
-      }
+      if can_posix?
+        Signal.trap("TERM") {
+          STDERR.puts "Received TERM signal"
+          EventMachine.stop
+        }
+      else
+        Signal.trap("INT") {
+          STDERR.puts "Received INT signal"
+          EventMachine.stop
+        }
+      end
       EventMachine.run {
         EventMachine.start_server 'localhost', @port, SolargraphRailsExt::EventModule
       }
