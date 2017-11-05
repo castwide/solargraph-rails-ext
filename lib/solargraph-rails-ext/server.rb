@@ -23,15 +23,19 @@ module SolargraphRailsExt
     private
 
     def load_environment
-      Dir.chdir workspace
-      Bundler.with_original_env do
-        ENV['BUNDLE_GEMFILE'] = File.join(workspace, 'Gemfile')
-        Bundler.reset!
-        Bundler.require
-        rails_config = File.join(workspace, 'config', 'environment.rb')
-        if File.file?(rails_config)
-          require_relative(rails_config)
+      begin
+        Dir.chdir workspace
+        Bundler.with_original_env do
+          ENV['BUNDLE_GEMFILE'] = File.join(workspace, 'Gemfile')
+          Bundler.reset!
+          Bundler.require
+          rails_config = File.join(workspace, 'config', 'environment.rb')
+          if File.file?(rails_config)
+            require_relative(rails_config)
+          end
         end
+      rescue Exception => e
+        STDERR.puts "Error loading Rails environment: #{e}"
       end
     end
   end

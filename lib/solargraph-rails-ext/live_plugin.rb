@@ -11,14 +11,17 @@ module SolargraphRailsExt
     def initialize workspace
       @workspace = workspace
       @cache = {}
-      @semaphore = Mutex.new
       @port = available_port
-      @job = spawn("solargraph-rails-ext", workspace, @port.to_s)
-      at_exit { Process.kill("KILL", @job) unless @job.nil? }
+      at_exit { close }
+      open
+    end
+
+    def open
+      @job = spawn("solargraph-rails-ext", workspace, @port.to_s) if @job.nil?
     end
 
     def close
-      Process.kill("KILL", @job)
+      Process.kill("KILL", @job) unless @job.nil?
       @job = nil
     end
 
