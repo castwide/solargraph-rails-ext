@@ -7,12 +7,12 @@ describe SolargraphRailsExt do
   end
 
   it "finds a model's runtime methods" do
-    sugg = @api_map.get_methods('User').map(&:to_s)
+    sugg = @api_map.get_methods('ApplicationRecord').map(&:to_s)
     expect(sugg).to include('where')
   end
 
   it "finds a model's instance methods" do
-    sugg = @api_map.get_instance_methods('User').map(&:to_s)
+    sugg = @api_map.get_instance_methods('ApplicationRecord').map(&:to_s)
     expect(sugg).to include('save')
   end
 end
