@@ -25,7 +25,6 @@ module SolargraphRailsExt
         else
           @job = spawn("solargraph-rails-ext", workspace, @port.to_s, "<NUL", new_pgroup: true)
         end
-        Process.detach(@job)
       end
     end
 
@@ -37,7 +36,6 @@ module SolargraphRailsExt
         else
           Process.kill("INT", @job)
         end
-        Process.wait(@job)
         @job = nil
       end
     end
