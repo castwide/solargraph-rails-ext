@@ -14,10 +14,9 @@ module SolargraphRailsExt
       @cache = {}
       @port = available_port
       @thread = nil
-      open
     end
 
-    def open
+    def start
       return unless using_rails?
       if @job.nil?
         STDERR.puts "Starting the server process on port #{@port}"
@@ -29,7 +28,7 @@ module SolargraphRailsExt
       end
     end
 
-    def close
+    def stop
       return unless using_rails?
       unless @job.nil?
         STDERR.puts "Closing #{@job} (port #{@port})"
