@@ -3,15 +3,11 @@ require 'socket'
 require 'json'
 
 module SolargraphRailsExt
-  class LivePlugin
+  class LivePlugin < Solargraph::Plugin::Base
     include Solargraph::ServerMethods
     include SolargraphRailsExt::ProcessMethods
 
-    attr_reader :workspace
-
-    def initialize workspace
-      @workspace = workspace
-      @cache = {}
+    def post_initialize
       @port = available_port
       @thread = nil
     end
@@ -41,12 +37,12 @@ module SolargraphRailsExt
       end
     end
 
-    def query namespace, root, scope, visibility
+    def get_methods namespace:, root:, scope:, with_private: false
       return [] unless using_rails?
       begin
         s = TCPSocket.open('localhost', @port)
         s.puts({
-          scope: scope, namespace: namespace, root: root, visibility: visibility
+          scope: scope, namespace: namespace, root: root, with_private: with_private
         }.to_json)
         data = s.gets
         return [] if data.nil?

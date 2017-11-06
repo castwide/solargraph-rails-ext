@@ -4,23 +4,18 @@ module SolargraphRailsExt
     end
 
     def receive_data data
-      if data.strip == 'close'
-        STDERR.puts "Received close command"
-        EventMachine.stop
-        return
-      end
       parts = JSON.parse(data)
       result = []
       con = find_constant(parts['namespace'], parts['root'])
       unless con.nil?
         if (parts['scope'] == 'class')
-          if parts['visibility'] == 'private'
+          if parts['with_private']
             result.concat con.methods
           else
             result.concat con.public_methods
           end
         elsif (parts['scope'] == 'instance')
-          if parts['visibility'] == 'private'
+          if parts['with_private']
             result.concat con.instance_methods
           else
             result.concat con.public_instance_methods
