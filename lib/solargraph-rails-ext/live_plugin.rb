@@ -38,19 +38,19 @@ module SolargraphRailsExt
     end
 
     def get_methods namespace:, root:, scope:, with_private: false
-      return [] unless using_rails?
+      return respond_ok([]) unless using_rails?
       begin
         s = TCPSocket.open('localhost', @port)
         s.puts({
           scope: scope, namespace: namespace, root: root, with_private: with_private
         }.to_json)
         data = s.gets
-        return [] if data.nil?
         s.close
-        JSON.parse(data)
+        return respond_ok([]) if data.nil?
+        respond_ok JSON.parse(data)
       rescue Errno::ECONNREFUSED => e
         STDERR.puts "The Rails live plugin is not ready yet."
-        []
+        respond_err e
       end
     end
 
