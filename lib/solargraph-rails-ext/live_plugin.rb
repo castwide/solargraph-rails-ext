@@ -39,11 +39,13 @@ module SolargraphRailsExt
 
     def get_methods namespace:, root:, scope:, with_private: false
       return respond_ok([]) unless using_rails?
+      params = {
+        scope: scope, namespace: namespace, root: root, with_private: with_private
+      }
+      puts params.inspect
       begin
         s = TCPSocket.open('localhost', @port)
-        s.puts({
-          scope: scope, namespace: namespace, root: root, with_private: with_private
-        }.to_json)
+        s.puts params.to_json
         data = s.gets
         s.close
         return respond_ok([]) if data.nil?

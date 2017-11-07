@@ -42,7 +42,7 @@ module SolargraphRailsExt
           ENV['BUNDLE_GEMFILE'] = File.join(workspace, 'Gemfile')
           Bundler.reset!
           Bundler.require
-          rails_config = File.join(workspace, 'config', 'environment.rb')
+          rails_config = File.join(workspace, 'config', 'application.rb')
           if File.file?(rails_config)
             require_relative(rails_config)
           end

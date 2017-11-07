@@ -34,15 +34,12 @@ module SolargraphRailsExt
     def find_constant(namespace, root)
       result = nil
       parts = root.split('::')
-      if parts.empty?
-        result = inner_find_constant(namespace)
-      else
-        until parts.empty?
-          result = inner_find_constant("#{parts.join('::')}::#{namespace}")
-          break unless result.nil?
-          parts.pop
-        end
+      until parts.empty?
+        result = inner_find_constant("#{parts.join('::')}::#{namespace}")
+        parts.pop
+        break unless result.nil?
       end
+      result = inner_find_constant(namespace) if result.nil?
       result
     end
 
