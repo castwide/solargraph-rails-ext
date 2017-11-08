@@ -3,7 +3,7 @@ require 'socket'
 require 'json'
 
 module SolargraphRailsExt
-  class LivePlugin < Solargraph::Plugin::Base
+  class LivePlugin < Solargraph::Plugin::Runtime
     include Solargraph::ServerMethods
     include SolargraphRailsExt::ProcessMethods
 
