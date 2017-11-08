@@ -17,9 +17,9 @@ module SolargraphRailsExt
       if @job.nil?
         STDERR.puts "Starting the server process on port #{@port}"
         if can_posix?
-          @job = spawn("solargraph-rails-ext", workspace, @port.to_s)
+          @job = spawn("solargraph-rails-ext", api_map.workspace, @port.to_s)
         else
-          @job = spawn("solargraph-rails-ext", workspace, @port.to_s, "<NUL", new_pgroup: true)
+          @job = spawn("solargraph-rails-ext", api_map.workspace, @port.to_s, "<NUL", new_pgroup: true)
         end
       end
     end
@@ -58,7 +58,7 @@ module SolargraphRailsExt
     def using_rails?
       # @todo This a quick and dirty way to see if the workspace is a Rails
       # project. Investigate better methods.
-      File.exist?(File.join workspace, 'bin', 'rails')
+      File.exist?(File.join api_map.workspace, 'bin', 'rails')
     end
   end
 end
