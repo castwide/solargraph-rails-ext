@@ -42,7 +42,6 @@ module SolargraphRailsExt
       params = {
         scope: scope, namespace: namespace, root: root, with_private: with_private
       }
-      puts params.inspect
       begin
         s = TCPSocket.open('localhost', @port)
         s.puts params.to_json
