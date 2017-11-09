@@ -4,6 +4,10 @@ module SolargraphRailsExt
     end
 
     def receive_data data
+      if data.nil? or data.strip.empty?
+        send_data "#{ { status: 'err', data: [], message: 'Invalid request' }.to_json }\n"
+        return
+      end
       parts = JSON.parse(data)
       result = []
       con = find_constant(parts['namespace'], parts['root'])
