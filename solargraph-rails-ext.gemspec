@@ -18,7 +18,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.executables   = ['solargraph-rails-ext']
   spec.add_dependency 'solargraph', '~> 0.14.0'
-  spec.add_dependency 'eventmachine'
 
   spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 12.2.1"
