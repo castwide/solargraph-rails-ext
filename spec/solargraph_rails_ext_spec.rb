@@ -2,8 +2,6 @@ describe SolargraphRailsExt do
   before :all do
     @workspace = File.realpath(File.join(File.dirname(__FILE__), '..', 'rails-test'))
     @api_map = Solargraph::ApiMap.new(@workspace)
-    # HACK: Wait for the server to start listening
-    sleep(8)
   end
 
   it "finds a model's runtime methods" do
