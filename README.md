@@ -2,7 +2,7 @@
 
 **This project is currently on hiatus.**
 
-The functionality that this extension provides is now available in the core [Solargraph gem](https://github.com/castwide/solargraph). There is no need to install this extension at the moment, although it might get updated with additional Rails-specific features in the future.
+The functionality that this extension provides is now available in the core [Solargraph gem](https://github.com/castwide/solargraph). **There is no need to install this extension at the moment**, although it might get updated with additional Rails-specific features in the future.
 
 ## Testing in VS Code
 
